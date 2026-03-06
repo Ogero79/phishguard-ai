@@ -11,7 +11,7 @@ __pycache__/
 data/raw/
 
 # Large model files
-*.pkl
+
 
 # OS files
 .DS_Store
@@ -23,3 +23,5 @@ env/
 
 # Claude
 .claude/
+.vscode/
+data/raw/
