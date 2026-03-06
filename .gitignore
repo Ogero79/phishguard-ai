@@ -11,7 +11,7 @@ __pycache__/
 data/raw/
 
 # Large model files
-*.pkl
+
 
 # OS files
 .DS_Store
@@ -20,3 +20,6 @@ Thumbs.db
 # Virtual environment
 venv/
 env/
+
+.vscode/
+data/raw/
