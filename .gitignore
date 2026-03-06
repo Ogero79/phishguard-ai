@@ -20,3 +20,6 @@ Thumbs.db
 # Virtual environment
 venv/
 env/
+
+# Claude
+.claude/
