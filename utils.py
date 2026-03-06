@@ -25,10 +25,10 @@ import math
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from urllib.parse import urlparse
 
 import joblib
 import numpy as np
+import tldextract
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -43,7 +43,7 @@ logger = logging.getLogger("phishguard.utils")
 # ---------------------------------------------------------------------------
 # Paths  (relative so they work on any machine and on Streamlit Cloud)
 # ---------------------------------------------------------------------------
-_ROOT = Path(__file__).resolve().parent.parent  # project root
+_ROOT = Path(__file__).resolve().parent  # project root
 MODELS_DIR = _ROOT / "models"
 MODEL_PATH = MODELS_DIR / "model.pkl"
 SCALER_PATH = MODELS_DIR / "scaler.pkl"
@@ -188,10 +188,9 @@ def load_artifacts(
 # Feature engineering  (must mirror M3's implementation exactly)
 # ---------------------------------------------------------------------------
 
-# Regex compiled once at import time for efficiency.
-_IP_PATTERN = re.compile(
-    r"(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)"
-)
+# IP regex must match M3's training implementation exactly.
+# M3 uses a loose pattern: r'\d+\.\d+\.\d+\.\d+'
+_IP_PATTERN = re.compile(r"\d+\.\d+\.\d+\.\d+")
 
 
 def _shannon_entropy(text: str) -> float:
@@ -212,32 +211,19 @@ def _shannon_entropy(text: str) -> float:
     return -sum((cnt / length) * math.log2(cnt / length) for cnt in freq.values())
 
 
-def _count_subdomains(hostname: str) -> int:
+def _count_subdomains(url: str) -> int:
     """
-    Count the number of subdomain levels for a given hostname.
+    Count subdomain levels using tldextract (matches M3's implementation).
 
-    We subtract 2 to account for the registered domain and TLD, so
-    ``www.paypal.com`` has 1 subdomain (``www``),
-    ``secure.paypal.verify.attacker.com`` has 3.
-    Returns 0 when the count would be negative (bare domains / IPs).
+    tldextract correctly handles multi-part TLDs like .co.uk, so
+    ``www.example.co.uk`` has 1 subdomain, not 2.
     """
-    if not hostname:
-        return 0
-    parts = hostname.split(".")
-    return max(0, len(parts) - 2)
+    ext = tldextract.extract(url)
+    sub = ext.subdomain
+    if sub:
+        return len(sub.split("."))
+    return 0
 
-
-def _normalise_url(url: str) -> str:
-    """
-    Ensure the URL has a scheme so urlparse can split it correctly.
-    If no scheme is present, ``http://`` is prepended.
-    """
-    url = url.strip()
-    if not url:
-        return url
-    if "://" not in url:
-        url = "http://" + url
-    return url
 
 
 def extract_features(url: str) -> dict[str, float]:
@@ -266,18 +252,12 @@ def extract_features(url: str) -> dict[str, float]:
         raise InvalidURLError("URL must not be empty.")
 
     url = url.strip()
-    normalised = _normalise_url(url)
 
-    try:
-        parsed = urlparse(normalised)
-    except ValueError as exc:
-        raise InvalidURLError(f"Could not parse URL '{url}': {exc}") from exc
-
-    hostname: str = parsed.hostname or ""
-    full_url: str = normalised  # use normalised form for consistent length counts
+    # tldextract for subdomain/domain splitting (matches M3 exactly)
+    ext = tldextract.extract(url)
 
     # ------------------------------------------------------------------ #
-    # 1. url_length — total character count of the original URL
+    # 1. url_length — total character count of the raw URL
     # ------------------------------------------------------------------ #
     url_length = float(len(url))
 
@@ -292,7 +272,7 @@ def extract_features(url: str) -> dict[str, float]:
     num_hyphens = float(url.count("-"))
 
     # ------------------------------------------------------------------ #
-    # 4. num_slashes — count of '/' characters (path separators)
+    # 4. num_slashes — count of '/' characters
     # ------------------------------------------------------------------ #
     num_slashes = float(url.count("/"))
 
@@ -302,35 +282,35 @@ def extract_features(url: str) -> dict[str, float]:
     has_at = 1.0 if "@" in url else 0.0
 
     # ------------------------------------------------------------------ #
-    # 6. has_https — HTTPS absence is a weak-but-supporting phishing signal
+    # 6. has_https — M3 uses str.startswith('https')
     # ------------------------------------------------------------------ #
-    has_https = 1.0 if parsed.scheme.lower() == "https" else 0.0
+    has_https = 1.0 if url.startswith("https") else 0.0
 
     # ------------------------------------------------------------------ #
-    # 7. has_ip — IP addresses in URLs are almost always malicious
+    # 7. has_ip — M3 uses loose regex r'\d+\.\d+\.\d+\.\d+' on raw URL
     # ------------------------------------------------------------------ #
-    has_ip = 1.0 if _IP_PATTERN.search(hostname) else 0.0
+    has_ip = 1.0 if _IP_PATTERN.search(url) else 0.0
 
     # ------------------------------------------------------------------ #
-    # 8. num_subdomains — excessive subdomains mimic legitimacy
+    # 8. num_subdomains — M3 uses tldextract.subdomain
     # ------------------------------------------------------------------ #
-    num_subdomains = float(_count_subdomains(hostname))
+    num_subdomains = float(_count_subdomains(url))
 
     # ------------------------------------------------------------------ #
-    # 9. digit_ratio — auto-generated phishing URLs contain more random digits
+    # 9. digit_ratio — digits / total length
     # ------------------------------------------------------------------ #
     digit_count = sum(1 for ch in url if ch.isdigit())
     digit_ratio = digit_count / len(url) if len(url) > 0 else 0.0
 
     # ------------------------------------------------------------------ #
-    # 10. url_entropy — Shannon entropy; higher = more random = more phishing
+    # 10. url_entropy — Shannon entropy
     # ------------------------------------------------------------------ #
     url_entropy = _shannon_entropy(url)
 
     # ------------------------------------------------------------------ #
-    # 11. domain_length — unusually long domains are a common phishing pattern
+    # 11. domain_length — M3 uses len(tldextract.domain), NOT full hostname
     # ------------------------------------------------------------------ #
-    domain_length = float(len(hostname))
+    domain_length = float(len(ext.domain))
 
     features: dict[str, float] = {
         "url_length": url_length,
@@ -350,15 +330,16 @@ def extract_features(url: str) -> dict[str, float]:
     return features
 
 
-def _features_to_array(features: dict[str, float]) -> np.ndarray:
+def _features_to_dataframe(features: dict[str, float]):
     """
-    Convert a feature dict to a 2-D numpy array in column order.
+    Convert a feature dict to a single-row DataFrame with column names.
 
-    The column order must match FEATURE_COLUMNS exactly, which is the order
-    used when training the scaler and model.
+    Using a DataFrame (not a plain array) avoids sklearn's
+    'X does not have valid feature names' warning, since M3's scaler
+    was fitted on a DataFrame with named columns.
     """
-    row = [features[col] for col in FEATURE_COLUMNS]
-    return np.array(row, dtype=np.float64).reshape(1, -1)
+    import pandas as pd
+    return pd.DataFrame([features], columns=FEATURE_COLUMNS)
 
 
 # ---------------------------------------------------------------------------
@@ -402,7 +383,7 @@ def predict(
     features = extract_features(url)
 
     # Build the feature matrix and scale
-    X_raw = _features_to_array(features)
+    X_raw = _features_to_dataframe(features)
     try:
         X_scaled = scaler.transform(X_raw)
     except Exception as exc:
