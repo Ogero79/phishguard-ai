@@ -21,5 +21,7 @@ Thumbs.db
 venv/
 env/
 
+# Claude
+.claude/
 .vscode/
 data/raw/

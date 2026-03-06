@@ -22,7 +22,7 @@ Phishing URL detection system using machine learning.
 ## Setup
 1. Clone the repository
 2. Install dependencies: pip install -r requirements.txt
-3. Download the PhiUSIIL dataset from Kaggle and place it in data/raw/
+3. Download the          dfsd   dataset from Kaggle and place it in data/raw/
 4. Run notebooks in order starting from 02_preprocessing.ipynb
 
 ## Run the App Locally
