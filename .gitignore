@@ -1,8 +1,28 @@
-node_modules/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
 build/
 dist/
-coverage/
+
+# Streamlit
+.streamlit/
+
+# OS
 .DS_Store
-*.log
-.env*
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 !.env.example
+
+# Logs
+*.log

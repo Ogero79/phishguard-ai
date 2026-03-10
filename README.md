@@ -1,20 +1,29 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# PhishGuard AI
 
-# Run and deploy your AI Studio app
+Advanced Phishing URL Detection system using Machine Learning to identify and explain malicious web links.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/5b3dc0a4-01b3-4836-a0fb-55a78f9ec809
+- **Real-time Analysis**: Instantly scan any URL for phishing indicators.
+- **XGBoost Classifier**: Powered by a high-performance machine learning model.
+- **Heuristic Extraction**: Analyzes 11 key features of the URL structure.
+- **Detailed Reports**: Provides a breakdown of why a URL was flagged.
 
-## Run Locally
+## Getting Started
 
-**Prerequisites:**  Node.js
+1. Enter a URL in the dashboard.
+2. Click **Analyze URL**.
+3. Review the security report and risk level.
 
+## Technical Details
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The system extracts features such as:
+- URL length
+- Number of dots, hyphens, and slashes
+- Presence of IP addresses
+- Domain length and entropy
+- Subdomain count
+
+## Security
+
+This tool is for research and educational purposes. Always exercise caution when visiting unknown links.

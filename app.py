@@ -26,6 +26,9 @@ st.markdown("""
     .result-card { padding: 30px; border-radius: 24px; border: 2px solid rgba(255, 255, 255, 0.1); margin-top: 20px; }
     .phishing-detected { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); }
     .safe-url { background-color: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
