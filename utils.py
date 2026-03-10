@@ -12,51 +12,51 @@ def extract_features(url):
     """
     features = {}
     
-    # 1. URL length
-    features['URL length'] = len(url)
+    # 1. url_length
+    features['url_length'] = len(url)
     
-    # 2. Number of dots
-    features['Number of dots'] = url.count('.')
+    # 2. num_dots
+    features['num_dots'] = url.count('.')
     
-    # 3. Number of hyphens
-    features['Number of hyphens'] = url.count('-')
+    # 3. num_hyphens
+    features['num_hyphens'] = url.count('-')
     
-    # 4. Number of slashes
-    features['Number of slashes'] = url.count('/')
+    # 4. num_slashes
+    features['num_slashes'] = url.count('/')
     
-    # 5. Has @ symbol
-    features['Has @ symbol'] = 1 if '@' in url else 0
+    # 5. has_at
+    features['has_at'] = 1 if '@' in url else 0
     
-    # 6. Has HTTPS
-    features['Has HTTPS'] = 1 if url.startswith('https') else 0
+    # 6. has_https
+    features['has_https'] = 1 if url.startswith('https') else 0
     
-    # 7. Has IP address
-    features['Has IP address'] = 1 if re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', url) else 0
+    # 7. has_ip
+    features['has_ip'] = 1 if re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', url) else 0
     
-    # 8. Number of subdomains
+    # 8. num_subdomains
     domain_match = re.search(r'https?://([^/]+)', url)
     if domain_match:
         domain = domain_match.group(1)
         parts = domain.split('.')
-        features['Number of subdomains'] = max(0, len(parts) - 2)
+        features['num_subdomains'] = max(0, len(parts) - 2)
     else:
-        features['Number of subdomains'] = 0
+        features['num_subdomains'] = 0
         
-    # 9. Digit ratio
-    features['Digit ratio'] = sum(c.isdigit() for c in url) / len(url) if len(url) > 0 else 0
+    # 9. digit_ratio
+    features['digit_ratio'] = sum(c.isdigit() for c in url) / len(url) if len(url) > 0 else 0
     
-    # 10. URL entropy (Shannon Entropy)
+    # 10. url_entropy
     if len(url) > 0:
         prob = [float(url.count(c)) / len(url) for c in dict.fromkeys(list(url))]
-        features['URL entropy'] = - sum([p * math.log(p) / math.log(2.0) for p in prob])
+        features['url_entropy'] = - sum([p * math.log(p) / math.log(2.0) for p in prob])
     else:
-        features['URL entropy'] = 0
+        features['url_entropy'] = 0
         
-    # 11. Domain length
+    # 11. domain_length
     if domain_match:
-        features['Domain length'] = len(domain_match.group(1))
+        features['domain_length'] = len(domain_match.group(1))
     else:
-        features['Domain length'] = 0
+        features['domain_length'] = 0
     
     return features
 
@@ -90,11 +90,11 @@ def predict_url(url, model, scaler, demo_mode=False):
         return is_phishing, confidence, feature_dict
     
     # Real Prediction Logic
-    # Convert dict to array in the correct order
+    # Convert dict to array in the correct order (matching model's feature_names_in_)
     feature_names = [
-        'URL length', 'Number of dots', 'Number of hyphens', 'Number of slashes',
-        'Has @ symbol', 'Has HTTPS', 'Has IP address', 'Number of subdomains',
-        'Digit ratio', 'URL entropy', 'Domain length'
+        'url_length', 'num_dots', 'num_hyphens', 'num_slashes', 'has_at',
+        'has_https', 'has_ip', 'num_subdomains', 'digit_ratio', 'url_entropy',
+        'domain_length'
     ]
     X = np.array([feature_dict[f] for f in feature_names]).reshape(1, -1)
     
