@@ -27,7 +27,7 @@ st.markdown("""
     .phishing-detected { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); }
     .safe-url { background-color: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
 </style>
-""", unsafe_content_allowed=True)
+""", unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
@@ -38,7 +38,7 @@ with st.sidebar:
         </div>
         <h1 style="margin:0; font-size: 24px; font-weight: 900; color: white;">PhishGuard AI</h1>
     </div>
-    """, unsafe_content_allowed=True)
+    """, unsafe_allow_html=True)
     
     st.markdown("### Project Status")
     model, scaler, demo_mode = load_model()
@@ -91,7 +91,7 @@ if st.button("Analyze URL") and url:
             <hr style="opacity: 0.1; margin: 20px 0;">
             <p style="font-size: 0.8rem; opacity: 0.7; font-family: monospace;">TARGET: {url}</p>
         </div>
-        """, unsafe_content_allowed=True)
+        """, unsafe_allow_html=True)
     else:
         st.markdown(f"""
         <div class="result-card safe-url">
@@ -101,7 +101,7 @@ if st.button("Analyze URL") and url:
             <hr style="opacity: 0.1; margin: 20px 0;">
             <p style="font-size: 0.8rem; opacity: 0.7; font-family: monospace;">TARGET: {url}</p>
         </div>
-        """, unsafe_content_allowed=True)
+        """, unsafe_allow_html=True)
     
     with st.expander("Detailed Feature Breakdown"):
         st.write("The following 11 features were extracted and passed to the model:")
@@ -118,4 +118,4 @@ elif not url:
         <h3>System Ready</h3>
         <p>Paste a URL above to initiate the security scan.</p>
     </div>
-    """, unsafe_content_allowed=True)
+    """, unsafe_allow_html=True)
