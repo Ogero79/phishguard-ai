@@ -1,35 +1,20 @@
-# PhishGuard AI
-Phishing URL detection system using machine learning.
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-## Team
-| Member | Role |
-|---|---|
-| Brian Ogero | Team Lead |
-| Irene | Data Engineer |
-| Ian | AI Engineer |
-| Larry | Backend |
-| Aggy | Frontend |
+# Run and deploy your AI Studio app
 
-## Project Structure
-- data/raw — original downloaded dataset (not tracked by Git)
-- data/processed — cleaned and split dataset files
-- notebooks — Jupyter notebooks for each project stage
-- models — trained model and scaler files
-- plots — all saved visualisation images
-- app.py — Streamlit web application
-- utils.py — feature extraction and prediction pipeline
+This contains everything you need to run your app locally.
 
-## Setup
-1. Clone the repository
-2. Install dependencies: pip install -r requirements.txt
-3. Download the PhiUSIIL dataset from Kaggle and place it in data/raw/
-4. Run notebooks in order starting from 02_preprocessing.ipynb
+View your app in AI Studio: https://ai.studio/apps/5b3dc0a4-01b3-4836-a0fb-55a78f9ec809
 
-## Run the App Locally
-streamlit run app.py
+## Run Locally
 
-## Live Deployment
-[URL will be added in Week 3]
+**Prerequisites:**  Node.js
 
-## Dataset
-PhiUSIIL Phishing URL Dataset — Kaggle
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

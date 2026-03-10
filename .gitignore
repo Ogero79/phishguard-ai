@@ -1,22 +1,8 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-.env
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Data files - raw data stays local
-data/raw/
-
-# Large model files
-*.pkl
-
-# OS files
+node_modules/
+build/
+dist/
+coverage/
 .DS_Store
-Thumbs.db
-
-# Virtual environment
-venv/
-env/
+*.log
+.env*
+!.env.example
