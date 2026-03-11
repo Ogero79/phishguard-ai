@@ -99,7 +99,7 @@ def predict_url(url, model, scaler, demo_mode=False):
         'has_https', 'has_ip', 'num_subdomains', 'digit_ratio', 'url_entropy',
         'domain_length'
     ]
-    X = np.array([feature_dict[f] for f in feature_names]).reshape(1, -1)
+    X = pd.DataFrame([feature_dict], columns=feature_names)
     
     # Scale and Predict
     X_scaled = scaler.transform(X)
