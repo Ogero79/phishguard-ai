@@ -1,27 +1,28 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-.env
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+build/
+dist/
 
-# Jupyter
-.ipynb_checkpoints/
+# Streamlit
+.streamlit/
 
-# Data files - raw data stays local
-data/raw/
-
-# Large model files
-
-
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
-# Virtual environment
-venv/
-env/
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
 
-# Claude
-.claude/
-.vscode/
-data/raw/
+# Logs
+*.log
