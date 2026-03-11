@@ -1,29 +1,35 @@
 # PhishGuard AI
+Phishing URL detection system using machine learning.
 
-Advanced Phishing URL Detection system using Machine Learning to identify and explain malicious web links.
+## Team
+| Member | Role |
+|---|---|
+| Brian Ogero | Team Lead |
+| Irene | Data Engineer |
+| Ian | AI Engineer |
+| Larry | Backend |
+| Aggy | Frontend |
 
-## Features
+## Project Structure
+- data/raw — original downloaded dataset (not tracked by Git)
+- data/processed — cleaned and split dataset files
+- notebooks — Jupyter notebooks for each project stage
+- models — trained model and scaler files
+- plots — all saved visualisation images
+- app.py — Streamlit web application
+- utils.py — feature extraction and prediction pipeline
 
-- **Real-time Analysis**: Instantly scan any URL for phishing indicators.
-- **XGBoost Classifier**: Powered by a high-performance machine learning model.
-- **Heuristic Extraction**: Analyzes 11 key features of the URL structure.
-- **Detailed Reports**: Provides a breakdown of why a URL was flagged.
+## Setup
+1. Clone the repository
+2. Install dependencies: pip install -r requirements.txt
+3. Download the          dfsd   dataset from Kaggle and place it in data/raw/
+4. Run notebooks in order starting from 02_preprocessing.ipynb
 
-## Getting Started
+## Run the App Locally
+streamlit run app.py
 
-1. Enter a URL in the dashboard.
-2. Click **Analyze URL**.
-3. Review the security report and risk level.
+## Live Deployment
+[URL will be added in Week 3]
 
-## Technical Details
-
-The system extracts features such as:
-- URL length
-- Number of dots, hyphens, and slashes
-- Presence of IP addresses
-- Domain length and entropy
-- Subdomain count
-
-## Security
-
-This tool is for research and educational purposes. Always exercise caution when visiting unknown links.
+## Dataset
+PhiUSIIL Phishing URL Dataset — Kaggle
