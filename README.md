@@ -29,7 +29,7 @@ Phishing URL detection system using machine learning.
 streamlit run app.py
 
 ## Live Deployment
-[URL will be added in Week 3]
+https://phishguard-ai-2026.streamlit.app/
 
 ## Dataset
 PhiUSIIL Phishing URL Dataset — Kaggle
