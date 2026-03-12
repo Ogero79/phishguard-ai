@@ -5,10 +5,10 @@ Phishing URL detection system using machine learning.
 | Member | Role |
 |---|---|
 | Brian Ogero | Team Lead |
-| Irene | Data Engineer |
-| Ian | AI Engineer |
-| Larry | Backend |
-| Aggy | Frontend |
+| Irene Kambo | Data Engineer |
+| Ian Kipkurui| AI Engineer |
+| Larry Mjomba | Backend |
+| Agnes Mugure| Frontend |
 
 ## Project Structure
 - data/raw — original downloaded dataset (not tracked by Git)
