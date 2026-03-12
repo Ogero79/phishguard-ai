@@ -4,12 +4,21 @@ import math
 import re
 import joblib
 import os
+import tldextract
+
+def normalize_url(url):
+    """Ensure the URL has a scheme so all features are computed consistently."""
+    url = url.strip()
+    if not re.match(r'https?://', url, re.IGNORECASE):
+        url = 'http://' + url
+    return url
 
 def extract_features(url):
     """
     FINAL IMPLEMENTATION: Extracts all 11 features defined in the Team Guide (Page 8-9).
     This must match M3's training features exactly.
     """
+    url = normalize_url(url)
     features = {}
     
     # 1. url_length
@@ -31,32 +40,25 @@ def extract_features(url):
     features['has_https'] = 1 if url.startswith('https') else 0
     
     # 7. has_ip
-    features['has_ip'] = 1 if re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', url) else 0
+    features['has_ip'] = 1 if re.search(r'\d+\.\d+\.\d+\.\d+', url) else 0
     
     # 8. num_subdomains
-    domain_match = re.search(r'https?://([^/]+)', url)
-    if domain_match:
-        domain = domain_match.group(1)
-        parts = domain.split('.')
-        features['num_subdomains'] = max(0, len(parts) - 2)
-    else:
-        features['num_subdomains'] = 0
+    ext = tldextract.extract(url)
+    sub = ext.subdomain
+    features['num_subdomains'] = len(sub.split('.')) if sub else 0
         
     # 9. digit_ratio
     features['digit_ratio'] = sum(c.isdigit() for c in url) / len(url) if len(url) > 0 else 0
     
     # 10. url_entropy
     if len(url) > 0:
-        prob = [float(url.count(c)) / len(url) for c in dict.fromkeys(list(url))]
+        prob = [float(url.count(c)) / len(url) for c in set(url)]
         features['url_entropy'] = - sum([p * math.log(p) / math.log(2.0) for p in prob])
     else:
         features['url_entropy'] = 0
         
     # 11. domain_length
-    if domain_match:
-        features['domain_length'] = len(domain_match.group(1))
-    else:
-        features['domain_length'] = 0
+    features['domain_length'] = len(ext.domain) if ext.domain else 0
     
     return features
 
@@ -81,8 +83,9 @@ def predict_url(url, model, scaler, demo_mode=False):
     """
     Full prediction pipeline: Extract -> Scale -> Predict.
     """
+    url = normalize_url(url)
     feature_dict = extract_features(url)
-    
+
     if demo_mode:
         # High-quality heuristic for demo if model files aren't present yet
         is_phishing = any(word in url.lower() for word in ['verify', 'secure', 'login', 'update', '192.168', 'paypal', 'bank'])
@@ -96,7 +99,7 @@ def predict_url(url, model, scaler, demo_mode=False):
         'has_https', 'has_ip', 'num_subdomains', 'digit_ratio', 'url_entropy',
         'domain_length'
     ]
-    X = np.array([feature_dict[f] for f in feature_names]).reshape(1, -1)
+    X = pd.DataFrame([feature_dict], columns=feature_names)
     
     # Scale and Predict
     X_scaled = scaler.transform(X)
